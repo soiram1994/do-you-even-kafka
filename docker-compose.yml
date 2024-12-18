@@ -163,3 +163,36 @@ services:
       KAFKA_REST_BOOTSTRAP_SERVERS: 'broker:29092'
       KAFKA_REST_LISTENERS: "http://0.0.0.0:8082"
       KAFKA_REST_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081'
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "Your_password123"  # Use a secure password
+    ports:
+      - "1433:1433"
+    volumes:
+      - ./data:/data
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "SA", "-P", "Your_password123", "-Q", "SELECT 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  db_init:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sqlserver_init
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    volumes:
+      - ./data:/data
+    entrypoint: /bin/bash
+    command: >-
+      -c "
+      sleep 5 &&
+      /opt/mssql-tools/bin/sqlcmd -S sqlserver -U SA -P Your_password123 -d master -i /data/initialize.sql &&
+      echo 'Initialization script executed.'
+      "

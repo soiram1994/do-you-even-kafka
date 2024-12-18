@@ -1,0 +1,15 @@
+{
+    "name": "sqlserver-jdbc-source",
+    "config": {
+        "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
+        "tasks.max": "1",
+        "connection.url": "jdbc:sqlserver://sqlserver:1433;databaseName=SampleDb",
+        "connection.user": "SA",
+        "connection.password": "Your_password123",
+        "mode": "incrementing",
+        "incrementing.column.name": "UserId",
+        "table.whitelist": "Users",
+        "topic.prefix": "users_topic_",
+        "poll.interval.ms": "10000"
+    }
+}
