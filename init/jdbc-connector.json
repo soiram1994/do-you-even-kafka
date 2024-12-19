@@ -1,0 +1,15 @@
+{
+  "name": "jdbc-source-connector",
+  "config": {
+    "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
+    "tasks.max": "1",
+    "connection.url": "jdbc:sqlserver://sqlserver:1433;databaseName=order_db",
+    "connection.user": "sa",
+    "connection.password": "P@ssw0rd!",
+    "table.whitelist": "customers,products,orders,order_items",
+    "mode": "incrementing",
+    "incrementing.column.name": "id",
+    "topic.prefix": "jdbc-",
+    "poll.interval.ms": "10000"
+  }
+}
