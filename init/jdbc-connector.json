@@ -1,15 +1,22 @@
 {
-  "name": "jdbc-source-connector",
+  "name": "jdbc-source-connector-1",
   "config": {
     "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
     "tasks.max": "1",
     "connection.url": "jdbc:sqlserver://sqlserver:1433;databaseName=order_db",
     "connection.user": "sa",
     "connection.password": "P@ssw0rd!",
-    "table.whitelist": "customers,products,orders,order_items",
-    "mode": "incrementing",
-    "incrementing.column.name": "id",
-    "topic.prefix": "jdbc-",
-    "poll.interval.ms": "10000"
+    "mode": "bulk",
+    "query": "SELECT orders.id AS order_id, orders.customer_id, orders.order_date, (SELECT order_items.id AS item_id, order_items.product_id, order_items.quantity FROM order_items WHERE order_items.order_id = orders.id FOR JSON PATH) AS items FROM orders;",
+    "topic.prefix": "order",
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "poll.interval.ms": "1000",
+    "transforms": "ExtractKey, Flatten",
+    "transforms.AddTopicSuffix.replacement": "order",
+    "transforms.ExtractKey.type": "org.apache.kafka.connect.transforms.ExtractField$Key",
+    "transforms.ExtractKey.field": "order_id",
+    "transforms.Flatten.type": "org.apache.kafka.connect.transforms.Flatten$Value",
+    "transforms.Flatten.delimiter": "."
   }
 }
